@@ -1,0 +1,37 @@
+{
+  "name": "nigario",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server/app.js",
+  "scripts": {
+    
+    "dev": "nodemon --exec babel-node server/app.js",
+    "test": "nodemon --no-warnings --experimental-modules --es-module-specifier-resolution=node babel-node server/app.js",
+    "start": "sudo npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rupikz/nigario.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Rupikz/nigario/issues"
+  },
+  "homepage": "https://github.com/Rupikz/nigario#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.6",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "nodemon": "^2.0.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
