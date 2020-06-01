@@ -2,17 +2,12 @@
 
 var _terminalKit = require("terminal-kit");
 
-var _process = _interopRequireDefault(require("process"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
 _terminalKit.terminal.red('Это моя игра\n');
 
 var screen = new _terminalKit.ScreenBuffer({
   dst: _terminalKit.terminal,
   noFill: true
-}); // process.stdin.setRawMode(true);
-
+});
 var backgroundColor = {
   color: 0,
   bgColor: 0
@@ -113,45 +108,99 @@ var drawBall = function drawBall() {
   });
 };
 
+process.stdin.setRawMode(true);
+
+_terminalKit.terminal.grabInput();
+
+_terminalKit.terminal.on('key', function (name, matches, data) {
+  console.log(name);
+
+  if (name === 'w') {
+    if (platformLeft.ymin >= 3) {
+      platformLeft.ymin -= 2;
+      platformLeft.ymax -= 2;
+    }
+  }
+
+  if (name === 's') {
+    if (platformLeft.ymax < _terminalKit.terminal.height - 3) {
+      platformLeft.ymin += 2;
+      platformLeft.ymax += 2;
+    }
+  }
+
+  if (name === 'UP') {
+    if (platformRight.ymin >= 3) {
+      platformRight.ymin -= 2;
+      platformRight.ymax -= 2;
+    }
+  }
+
+  if (name === 'DOWN') {
+    if (platformRight.ymax < _terminalKit.terminal.height - 3) {
+      platformRight.ymin += 2;
+      platformRight.ymax += 2;
+    }
+  }
+
+  if (name === 'CTRL_C') {
+    _terminalKit.terminal.red('Игра окончена\n');
+
+    process.exit();
+  }
+
+  fillPlayingField();
+  fillPlayers();
+  drawBall();
+  screen.draw();
+});
+
 var draw = function draw() {
   fillPlayingField();
   fillPlayers();
   drawBall();
-  screen.draw(); // term.grabInput();
-  // term.on('key', (name, matches, data) => {
-  //   console.log(name);
-  //   if (name === 'w') {
-  //     if (platformLeft.ymin >= 3) {
-  //       platformLeft.ymin -= 2;
-  //       platformLeft.ymax -= 2;
-  //     }
-  //   }
-  //   if (name === 's') {
-  //     if (platformLeft.ymax < term.height - 3) {
-  //       platformLeft.ymin += 2;
-  //       platformLeft.ymax += 2;
-  //     }
-  //   }
-  //   if (name === 'UP') {
-  //     if (platformRight.ymin >= 3) {
-  //       platformRight.ymin -= 2;
-  //       platformRight.ymax -= 2;
-  //     }
-  //   }
-  //   if (name === 'DOWN') {
-  //     if (platformRight.ymax < term.height - 3) {
-  //       platformRight.ymin += 2;
-  //       platformRight.ymax += 2;
-  //     }
-  //   }
-  //   fillPlayingField();
-  //   fillPlayers();
-  //   screen.draw();
-  //   if (name === 'CTRL_C') {
-  //     term.red('Игра окончена\n');
-  //     process.exit();
-  //   }
-  // });
+  screen.draw();
+  var randomAngle = Math.floor(Math.random() * 3);
+  var ball = {
+    direction: !Math.floor(Math.random() * 2) ? 2 : -2,
+    angle: !Math.floor(Math.random() * 2) ? randomAngle : -randomAngle
+  };
+  var anim = setInterval(function () {
+    for (var i = 0; i <= Math.abs(ball.angle); i += 1) {
+      ballPositionDefault.xmin += ball.direction;
+      ballPositionDefault.xmax += ball.direction;
+
+      if (ballPositionDefault.ymin >= platformLeft.ymin && ballPositionDefault.ymin <= platformLeft.ymax && platformLeft.xmax + 3 > ballPositionDefault.xmin || ballPositionDefault.ymax >= platformRight.ymin && ballPositionDefault.ymax <= platformRight.ymax && platformRight.xmin - 2 < ballPositionDefault.xmax) {
+        // Отвечает за отражение левой и правой ракетки
+        ball.direction = -ball.direction;
+      }
+    }
+
+    if (ballPositionDefault.xmin < borderLeft.xmin || ballPositionDefault.xmax > borderRight.xmax) {
+      // term.red('Стоп игра');
+      screen.put({
+        x: _terminalKit.terminal.width / 2,
+        y: _terminalKit.terminal.height / 2,
+        direction: 'left',
+        attr: {
+          bgColor: 22
+        }
+      }, 'Stop game');
+      clearInterval(anim);
+      process.exit();
+    }
+
+    if (borderUp.ymax + 1 >= ballPositionDefault.ymin || borderDown.ymin - 1 <= ballPositionDefault.ymax) {
+      ball.angle = -ball.angle;
+    }
+
+    ballPositionDefault.ymin += Math.sign(ball.angle);
+    ballPositionDefault.ymax += Math.sign(ball.angle);
+    fillPlayingField();
+    fillPlayers();
+    drawBall();
+    screen.draw();
+  }, 180);
 };
 
 draw();

@@ -3,7 +3,6 @@ import { terminal as term, ScreenBuffer, Rect } from 'terminal-kit';
 term.red('Это моя игра\n');
 
 const screen = new ScreenBuffer({ dst: term, noFill: true });
-// process.stdin.setRawMode(true);
 
 const backgroundColor = {
   color: 0,
@@ -117,7 +116,47 @@ const drawBall = (position = ballPositionDefault) => {
   });
 };
 
-const draw = async () => {
+process.stdin.setRawMode(true);
+term.grabInput();
+term.on('key', (name) => {
+  if (name === 'w') {
+    if (platformLeft.ymin >= 3) {
+      platformLeft.ymin -= 2;
+      platformLeft.ymax -= 2;
+    }
+  }
+  if (name === 's') {
+    if (platformLeft.ymax < term.height - 3) {
+      platformLeft.ymin += 2;
+      platformLeft.ymax += 2;
+    }
+  }
+
+  if (name === 'UP') {
+    if (platformRight.ymin >= 3) {
+      platformRight.ymin -= 2;
+      platformRight.ymax -= 2;
+    }
+  }
+  if (name === 'DOWN') {
+    if (platformRight.ymax < term.height - 3) {
+      platformRight.ymin += 2;
+      platformRight.ymax += 2;
+    }
+  }
+
+  if (name === 'CTRL_C') {
+    term.red('Игра окончена\n');
+    process.exit();
+  }
+
+  fillPlayingField();
+  fillPlayers();
+  drawBall();
+  screen.draw();
+});
+
+const draw = () => {
   fillPlayingField();
   fillPlayers();
   drawBall();
@@ -138,17 +177,22 @@ const draw = async () => {
         && platformLeft.xmax + 3 > ballPositionDefault.xmin)
       || (ballPositionDefault.ymax >= platformRight.ymin
         && ballPositionDefault.ymax <= platformRight.ymax
-        && platformRight.xmin < ballPositionDefault.xmax)) { // Отвечает за отражение левой и правой ракетки
+        && platformRight.xmin - 2 < ballPositionDefault.xmax)) { // отражение левой и правой ракетки
         ball.direction = -ball.direction;
       }
     }
 
     if (ballPositionDefault.xmin < borderLeft.xmin
       || ballPositionDefault.xmax > borderRight.xmax) {
-      term.red('Стоп игра');
+      // term.red('Стоп игра');
+      screen.put({
+        x: term.width / 2, y: term.height / 2, direction: 'left', attr: { bgColor: 22 },
+      }, 'Stop game');
+      screen.draw();
       clearInterval(anim);
-      term.red('Стоп игра');
+      process.exit();
     }
+
     if (borderUp.ymax + 1 >= ballPositionDefault.ymin
         || borderDown.ymin - 1 <= ballPositionDefault.ymax) {
       ball.angle = -ball.angle;
@@ -161,45 +205,6 @@ const draw = async () => {
     drawBall();
     screen.draw();
   }, 180);
-
-  // term.grabInput();
-  // term.on('key', (name, matches, data) => {
-  //   console.log(name);
-  //   if (name === 'w') {
-  // if (platformLeft.ymin >= 3) {
-  //   platformLeft.ymin -= 2;
-  //   platformLeft.ymax -= 2;
-  // }
-  //   }
-  //   if (name === 's') {
-  //     if (platformLeft.ymax < term.height - 3) {
-  //       platformLeft.ymin += 2;
-  //       platformLeft.ymax += 2;
-  //     }
-  //   }
-
-  //   if (name === 'UP') {
-  //     if (platformRight.ymin >= 3) {
-  //       platformRight.ymin -= 2;
-  //       platformRight.ymax -= 2;
-  //     }
-  //   }
-  //   if (name === 'DOWN') {
-  //     if (platformRight.ymax < term.height - 3) {
-  //       platformRight.ymin += 2;
-  //       platformRight.ymax += 2;
-  //     }
-  //   }
-
-  //   fillPlayingField();
-  //   fillPlayers();
-  //   screen.draw();
-
-  //   if (name === 'CTRL_C') {
-  //     term.red('Игра окончена\n');
-  //     process.exit();
-  //   }
-  // });
 };
 
 draw();
