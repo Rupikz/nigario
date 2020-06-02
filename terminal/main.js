@@ -1,120 +1,24 @@
-import { terminal as term, ScreenBuffer, Rect } from 'terminal-kit';
-
-term.red('Это моя игра\n');
+import { terminal as term, ScreenBuffer } from 'terminal-kit';
+import fs from 'fs';
+import {
+  fillPlatforms, platformLeft, platformRight,
+  health, healthPositionFirst, healthPositionSecond,
+} from './platforms';
+import { fillBall, ballPositionDefault } from './ball';
+import {
+  fillPlayingField, borderUpPosition, borderDownPosition, borderLeftPosition, borderRightPosition,
+} from './field';
+import config from './config';
 
 const screen = new ScreenBuffer({ dst: term, noFill: true });
+fs.writeFileSync('error.txt', 'Начало');
 
-const backgroundColor = {
-  color: 0,
-  bgColor: 0,
-};
+let ballPosition = ballPositionDefault;
 
-const borderColor = {
-  bgColor: 24,
-};
-
-const borderUp = new Rect({
-  xmin: 0,
-  xmax: term.width,
-  ymin: 0,
-  ymax: 0,
-});
-
-const borderDown = new Rect({
-  xmin: 0,
-  xmax: term.width,
-  ymin: term.height - 1,
-  ymax: term.height,
-});
-
-const borderLeft = new Rect({
-  xmin: 0,
-  xmax: 1,
-  ymin: 0,
-  ymax: term.height,
-});
-
-const borderRight = new Rect({
-  xmin: term.width - 2,
-  xmax: term.width,
-  ymin: 0,
-  ymax: term.height,
-});
-
-const platformColor = {
-  bgColor: 2,
-};
-
-const platformLeft = new Rect({
-  xmin: 5,
-  xmax: 6,
-  ymin: term.height / 2 - term.height / 8,
-  ymax: term.height / 2 + term.height / 8,
-});
-
-const platformRight = new Rect({
-  xmin: term.width - 7,
-  xmax: term.width - 6,
-  ymin: term.height / 2 - term.height / 8,
-  ymax: term.height / 2 + term.height / 8,
-});
-
-const ballColor = {
-  bgColor: 22,
-};
-
-const ballPositionDefault = new Rect({
-  xmin: term.width / 2,
-  xmax: term.width / 2 + 1,
-  ymin: term.height / 2,
-  ymax: term.height / 2,
-});
-
-const fillPlayers = (left = platformLeft, right = platformRight, color = platformColor) => {
-  screen.fill({
-    attr: color,
-    region: left,
-  });
-
-  screen.fill({
-    attr: color,
-    region: right,
-  });
-};
-
-
-const fillPlayingField = () => {
-  screen.fill({
-    attr: backgroundColor,
-  });
-
-  screen.fill({
-    attr: borderColor,
-    region: borderUp,
-  });
-
-  screen.fill({
-    attr: borderColor,
-    region: borderDown,
-  });
-
-  screen.fill({
-    attr: borderColor,
-    region: borderLeft,
-  });
-
-  screen.fill({
-    attr: borderColor,
-    region: borderRight,
-  });
-};
-
-const drawBall = (position = ballPositionDefault) => {
-  screen.fill({
-    attr: ballColor,
-    region: position,
-  });
-};
+fillPlayingField(screen);
+fillPlatforms(screen);
+fillBall(screen);
+screen.draw();
 
 process.stdin.setRawMode(true);
 term.grabInput();
@@ -150,16 +54,16 @@ term.on('key', (name) => {
     process.exit();
   }
 
-  fillPlayingField();
-  fillPlayers();
-  drawBall();
+  fillPlayingField(screen);
+  fillPlatforms(screen);
+  fillBall(screen);
   screen.draw();
 });
 
 const draw = () => {
-  fillPlayingField();
-  fillPlayers();
-  drawBall();
+  fillPlayingField(screen);
+  fillPlatforms(screen);
+  fillBall(screen);
   screen.draw();
   const randomAngle = Math.floor(Math.random() * 3);
   const ball = {
@@ -169,40 +73,69 @@ const draw = () => {
 
   const anim = setInterval(() => {
     for (let i = 0; i <= Math.abs(ball.angle); i += 1) {
-      ballPositionDefault.xmin += ball.direction;
-      ballPositionDefault.xmax += ball.direction;
+      ballPosition.xmin += ball.direction;
+      ballPosition.xmax += ball.direction;
 
-      if ((ballPositionDefault.ymin >= platformLeft.ymin
-        && ballPositionDefault.ymin <= platformLeft.ymax
-        && platformLeft.xmax + 3 > ballPositionDefault.xmin)
-      || (ballPositionDefault.ymax >= platformRight.ymin
-        && ballPositionDefault.ymax <= platformRight.ymax
-        && platformRight.xmin - 2 < ballPositionDefault.xmax)) { // отражение левой и правой ракетки
+      if ((ballPosition.ymin >= platformLeft.ymin
+        && ballPosition.ymin <= platformLeft.ymax
+        && platformLeft.xmax + 3 > ballPosition.xmin)
+      || (ballPosition.ymax >= platformRight.ymin
+        && ballPosition.ymax <= platformRight.ymax
+        && platformRight.xmin - 2 < ballPosition.xmax)) { // отражение левой и правой ракетки
         ball.direction = -ball.direction;
+        const randomAngleChange = Math.abs(Math.floor(Math.random() * 3));
+        if (ball.angle < 0) { // рандомный угол отражение
+          ball.angle = -randomAngleChange;
+        } else {
+          ball.angle = randomAngleChange;
+        }
       }
     }
 
-    if (ballPositionDefault.xmin < borderLeft.xmin
-      || ballPositionDefault.xmax > borderRight.xmax) {
-      // term.red('Стоп игра');
+    if (ballPosition.xmax > borderRightPosition.xmax
+      || ballPosition.xmin < borderLeftPosition.xmin) {
+      fs.appendFileSync('error.txt', JSON.stringify(health));
+      if (ballPosition.xmin < borderLeftPosition.xmin) { // левая граница
+        health.playerFirst -= 1;
+      }
+      if (ballPosition.xmax > borderRightPosition.xmax) { // правая граница
+        health.playerSecond -= 1;
+      }
+      clearInterval(anim);
+      console.log(ballPosition);
+      ballPosition = ballPositionDefault;
+      console.log(ballPosition);
+
+      // fs.appendFileSync('error.txt', JSON.stringify(ballPosition));
+      screen.draw();
+    }
+
+
+    // fs.appendFileSync('error.txt', JSON.stringify(health));
+
+    if (health.playerFirst <= 0 || health.playerSecond <= 0) { // конец игры
+      const lostPlayer = health.playerFirst < health.playerSecond
+        ? 1 : 2;
       screen.put({
-        x: term.width / 2, y: term.height / 2, direction: 'left', attr: { bgColor: 22 },
-      }, 'Stop game');
+        x: term.width / 2,
+        y: term.height / 2.2,
+        attr: { color: 22, bgColor: config.backgroundColor },
+      }, 'Выйграл игрок: ', lostPlayer);
       screen.draw();
       clearInterval(anim);
       process.exit();
     }
 
-    if (borderUp.ymax + 1 >= ballPositionDefault.ymin
-        || borderDown.ymin - 1 <= ballPositionDefault.ymax) {
+    if (borderUpPosition.ymax + 1 >= ballPosition.ymin
+        || borderDownPosition.ymin - 1 <= ballPosition.ymax) { // отражение от верха и низа
       ball.angle = -ball.angle;
     }
 
-    ballPositionDefault.ymin += Math.sign(ball.angle);
-    ballPositionDefault.ymax += Math.sign(ball.angle);
-    fillPlayingField();
-    fillPlayers();
-    drawBall();
+    ballPosition.ymin += Math.sign(ball.angle);
+    ballPosition.ymax += Math.sign(ball.angle);
+    fillPlayingField(screen);
+    fillPlatforms(screen);
+    fillBall(screen);
     screen.draw();
   }, 180);
 };
