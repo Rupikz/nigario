@@ -13,7 +13,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 var backgroundColor = {
   attr: {
-    bgColor: _config["default"].backgroundColor
+    bgColor: _config["default"].color.backgroundColor
   }
 };
 var borderUpPosition = new _terminalKit.Rect({
@@ -45,7 +45,7 @@ var borderRightPosition = new _terminalKit.Rect({
 });
 exports.borderRightPosition = borderRightPosition;
 var borderColor = {
-  bgColor: _config["default"].borderColor
+  bgColor: _config["default"].color.borderColor
 };
 var borderUp = {
   attr: borderColor,

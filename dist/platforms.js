@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.healthPositionSecond = exports.healthPositionFirst = exports.health = exports.platformRight = exports.platformLeft = exports.fillPlatforms = void 0;
+exports.health = exports.platformRight = exports.platformLeft = exports.fillPlatforms = void 0;
 
 var _terminalKit = require("terminal-kit");
 
@@ -16,26 +16,8 @@ var health = {
   playerSecond: 3
 };
 exports.health = health;
-var healthPositionFirst = {
-  x: _terminalKit.terminal.width / 20,
-  y: _terminalKit.terminal.height / 20,
-  attr: {
-    color: 24,
-    bgColor: _config["default"].backgroundColor
-  }
-};
-exports.healthPositionFirst = healthPositionFirst;
-var healthPositionSecond = {
-  x: _terminalKit.terminal.width - _terminalKit.terminal.width / 20,
-  y: _terminalKit.terminal.height / 20,
-  attr: {
-    color: 24,
-    bgColor: _config["default"].backgroundColor
-  }
-};
-exports.healthPositionSecond = healthPositionSecond;
 var platformColor = {
-  bgColor: _config["default"].platformColor
+  bgColor: _config["default"].color.platformColor
 };
 var platformLeft = new _terminalKit.Rect({
   xmin: 5,

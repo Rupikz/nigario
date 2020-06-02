@@ -2,7 +2,7 @@ import { terminal as term, Rect } from 'terminal-kit';
 import config from './config';
 
 const ballColor = {
-  bgColor: config.ballColor,
+  bgColor: config.color.ballColor,
 };
 
 const ballPositionDefault = {

@@ -3,7 +3,7 @@ import config from './config';
 
 const backgroundColor = {
   attr: {
-    bgColor: config.backgroundColor,
+    bgColor: config.color.backgroundColor,
   },
 };
 
@@ -36,7 +36,7 @@ const borderRightPosition = new Rect({
 });
 
 const borderColor = {
-  bgColor: config.borderColor,
+  bgColor: config.color.borderColor,
 };
 
 const borderUp = {

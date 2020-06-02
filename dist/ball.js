@@ -12,7 +12,7 @@ var _config = _interopRequireDefault(require("./config"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var ballColor = {
-  bgColor: _config["default"].ballColor
+  bgColor: _config["default"].color.ballColor
 };
 var ballPositionDefault = {
   xmin: _terminalKit.terminal.width / 2,
