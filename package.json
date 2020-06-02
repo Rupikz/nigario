@@ -1,24 +1,21 @@
 {
   "name": "nigario",
   "version": "1.0.0",
-  "description": "",
-  "main": "server/app.js",
+  "description": "Small console game",
+  "main": "terminal/main.js",
   "scripts": {
-    "dev": "nodemon --exec babel-node server/app.js",
+    "start": "sudo npm run term",
     "term-dev": "nodemon --exec babel-node terminal/main.js",
     "term": "node dist/main.js",
-    "term-comp": "npx babel terminal --out-dir dist",
-    "test": "nodemon --no-warnings --experimental-modules --es-module-specifier-resolution=node babel-node server/app.js",
-    "start": "sudo npm run dev"
+    "build": "npx babel terminal --out-dir dist"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Rupikz/nigario.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["console", "game", "nodejs"],
+  "author": "Kudryavcev Nicolau",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/Rupikz/nigario/issues"
   },
