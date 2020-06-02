@@ -14,16 +14,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 var ballColor = {
   bgColor: _config["default"].ballColor
 };
-var ballPositionDefault = new _terminalKit.Rect({
+var ballPositionDefault = {
+  xmin: _terminalKit.terminal.width / 2,
+  xmax: _terminalKit.terminal.width / 2 + 1,
+  ymin: _terminalKit.terminal.height / 2,
+  ymax: _terminalKit.terminal.height / 2
+};
+exports.ballPositionDefault = ballPositionDefault;
+var ballPositionFill = new _terminalKit.Rect({
   xmin: _terminalKit.terminal.width / 2,
   xmax: _terminalKit.terminal.width / 2 + 1,
   ymin: _terminalKit.terminal.height / 2,
   ymax: _terminalKit.terminal.height / 2
 });
-exports.ballPositionDefault = ballPositionDefault;
 
 var fillBall = function fillBall(screen) {
-  var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ballPositionDefault;
+  var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ballPositionFill;
   screen.fill({
     attr: ballColor,
     region: position

@@ -1,1 +1,1 @@
-Начало{"playerFirst":3,"playerSecond":3}{"playerFirst":3,"playerSecond":2}{"playerFirst":3,"playerSecond":1}
+Начало{"playerFirst":2,"playerSecond":3}{"playerFirst":2,"playerSecond":3}{"playerFirst":1,"playerSecond":3}{"playerFirst":0,"playerSecond":3}{"playerFirst":2,"playerSecond":3}{"playerFirst":1,"playerSecond":3}{"playerFirst":0,"playerSecond":3}{"playerFirst":2,"playerSecond":3}{"playerFirst":1,"playerSecond":3}{"playerFirst":0,"playerSecond":3}{"playerFirst":2,"playerSecond":3}{"playerFirst":1,"playerSecond":3}{"playerFirst":1,"playerSecond":2}

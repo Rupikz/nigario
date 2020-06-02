@@ -17,15 +17,38 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 var screen = new _terminalKit.ScreenBuffer({
   dst: _terminalKit.terminal,
   noFill: true
-});
+}); // fs.writeFileSync('error.txt', 'Начало');
 
-_fs["default"].writeFileSync('error.txt', 'Начало');
+var ballPosition = new _terminalKit.Rect(_ball.ballPositionDefault);
 
-var ballPosition = _ball.ballPositionDefault;
-(0, _field.fillPlayingField)(screen);
-(0, _platforms.fillPlatforms)(screen);
-(0, _ball.fillBall)(screen);
-screen.draw();
+var screenDrow = function screenDrow() {
+  (0, _field.fillPlayingField)(screen);
+  (0, _platforms.fillPlatforms)(screen);
+  (0, _ball.fillBall)(screen, ballPosition);
+  screen.put({
+    x: _terminalKit.terminal.width / 20,
+    y: _terminalKit.terminal.height / 16,
+    attr: {
+      color: 22,
+      bgColor: _config["default"].backgroundColor
+    }
+  }, 'Сердечек: ', _platforms.health.playerFirst);
+  screen.put({
+    x: _terminalKit.terminal.width - _terminalKit.terminal.width / 10,
+    y: _terminalKit.terminal.height / 16,
+    attr: {
+      color: 22,
+      bgColor: _config["default"].backgroundColor
+    }
+  }, 'Сердечек: ', _platforms.health.playerSecond);
+  screen.draw();
+}; // fs.appendFileSync('error.txt', JSON.stringify(ballPosition));
+// fillPlayingField(screen);
+// fillPlatforms(screen);
+// fillBall(screen, ballPosition);
+// screen.draw();
+
+
 process.stdin.setRawMode(true);
 
 _terminalKit.terminal.grabInput();
@@ -65,18 +88,16 @@ _terminalKit.terminal.on('key', function (name) {
     process.exit();
   }
 
-  (0, _field.fillPlayingField)(screen);
-  (0, _platforms.fillPlatforms)(screen);
-  (0, _ball.fillBall)(screen);
-  screen.draw();
+  screenDrow();
 });
 
+var randomAngle = Math.floor(Math.random() * 2) + 1;
+
 var draw = function draw() {
-  (0, _field.fillPlayingField)(screen);
-  (0, _platforms.fillPlatforms)(screen);
-  (0, _ball.fillBall)(screen);
-  screen.draw();
-  var randomAngle = Math.floor(Math.random() * 3);
+  // fillPlayingField(screen);
+  // fillPlatforms(screen);
+  // fillBall(screen, ballPosition);
+  // screen.draw();
   var ball = {
     direction: !Math.floor(Math.random() * 2) ? 2 : -2,
     angle: !Math.floor(Math.random() * 2) ? randomAngle : -randomAngle
@@ -89,20 +110,17 @@ var draw = function draw() {
       if (ballPosition.ymin >= _platforms.platformLeft.ymin && ballPosition.ymin <= _platforms.platformLeft.ymax && _platforms.platformLeft.xmax + 3 > ballPosition.xmin || ballPosition.ymax >= _platforms.platformRight.ymin && ballPosition.ymax <= _platforms.platformRight.ymax && _platforms.platformRight.xmin - 2 < ballPosition.xmax) {
         // отражение левой и правой ракетки
         ball.direction = -ball.direction;
-        var randomAngleChange = Math.abs(Math.floor(Math.random() * 3));
 
         if (ball.angle < 0) {
           // рандомный угол отражение
-          ball.angle = -randomAngleChange;
+          ball.angle = -randomAngle;
         } else {
-          ball.angle = randomAngleChange;
+          ball.angle = randomAngle;
         }
       }
     }
 
     if (ballPosition.xmax > _field.borderRightPosition.xmax || ballPosition.xmin < _field.borderLeftPosition.xmin) {
-      _fs["default"].appendFileSync('error.txt', JSON.stringify(_platforms.health));
-
       if (ballPosition.xmin < _field.borderLeftPosition.xmin) {
         // левая граница
         _platforms.health.playerFirst -= 1;
@@ -113,17 +131,15 @@ var draw = function draw() {
         _platforms.health.playerSecond -= 1;
       }
 
-      console.log(ballPosition);
-      ballPosition = _ball.ballPositionDefault;
-      console.log(ballPosition); // fs.appendFileSync('error.txt', JSON.stringify(ballPosition));
+      ball.direction = -ball.direction;
+      ballPosition = new _terminalKit.Rect(_ball.ballPositionDefault);
 
-      screen.draw();
-    } // fs.appendFileSync('error.txt', JSON.stringify(health));
-
+      _fs["default"].appendFileSync('error.txt', JSON.stringify(_platforms.health));
+    }
 
     if (_platforms.health.playerFirst <= 0 || _platforms.health.playerSecond <= 0) {
       // конец игры
-      var lostPlayer = _platforms.health.playerFirst < _platforms.health.playerSecond ? 1 : 2;
+      var lostPlayer = _platforms.health.playerFirst < _platforms.health.playerSecond ? 2 : 1;
       screen.put({
         x: _terminalKit.terminal.width / 2,
         y: _terminalKit.terminal.height / 2.2,
@@ -144,10 +160,7 @@ var draw = function draw() {
 
     ballPosition.ymin += Math.sign(ball.angle);
     ballPosition.ymax += Math.sign(ball.angle);
-    (0, _field.fillPlayingField)(screen);
-    (0, _platforms.fillPlatforms)(screen);
-    (0, _ball.fillBall)(screen);
-    screen.draw();
+    screenDrow();
   }, 180);
 };
 

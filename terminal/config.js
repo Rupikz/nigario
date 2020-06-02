@@ -3,4 +3,5 @@ export default {
   borderColor: 24,
   platformColor: 2,
   ballColor: 22,
+  speed: 180,
 };
